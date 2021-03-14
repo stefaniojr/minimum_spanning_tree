@@ -25,6 +25,13 @@ int main(int argc, char *argv[])
         if (caracterAtual == fimLinha)
             nPontos++;
 
+    double distanciaPontos[nPontos][nPontos];
+
+    // Preenche matriz de distância entre pontos com 0's.
+    for (int i = 0; i < nPontos; i++)
+        for (int j = 0; j < nPontos; j++)
+            distanciaPontos[i][j] = 0;
+
     rewind(entrada);
 
     line = (char *)malloc(size);
@@ -45,14 +52,21 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < nPontos; i++)
     {
-        inserePonto(iniciaPonto(arrayPontos[i]), lista);
+        inserePonto(iniciaPonto(arrayPontos[i], i), lista);
         free(arrayPontos[i]);
     }
 
     free(arrayPontos);
-    liberaLista(lista);
 
-    //imprime(lista);
+    int max = 0;
+    for (int i = 0; i < nPontos; i++)
+    {
+        for (int j = 0; j < max; j++)
+            distanciaPontos[i][j] = calcDistancia(lista, i, j);
+        max++;
+    }
+
+    liberaLista(lista);
 
     return 0;
 }

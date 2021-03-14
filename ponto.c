@@ -5,6 +5,7 @@ typedef struct cel TCelula;
 struct ponto
 {
     char *nome;
+    int id;
     double *coordenadas;
     size_t sCoordenadas;
 };
@@ -31,11 +32,12 @@ ListaPontos *criaLista()
     return lista;
 }
 
-Ponto *iniciaPonto(char *dadosPonto)
+Ponto *iniciaPonto(char *dadosPonto, int id)
 {
 
     Ponto *ponto = (Ponto *)malloc(sizeof(Ponto));
 
+    ponto->id = id;
     char *substr = strtok(dadosPonto, ",\n");
     ponto->nome = (char *)malloc((strlen(substr) + 1) * (sizeof(char)));
     strcpy(ponto->nome, substr);
@@ -108,4 +110,46 @@ void liberaPonto(Ponto *ponto)
         free(ponto->coordenadas);
         free(ponto);
     }
+}
+
+double calcDistancia(ListaPontos *lista, int id1, int id2)
+{
+    TCelula *pontoCelula;
+    double *p1 = NULL, *p2 = NULL, distancia = 0;
+    size_t size, sIterator = 0;
+
+    for (pontoCelula = lista->ini; pontoCelula != NULL; pontoCelula = pontoCelula->prox)
+    {
+
+        if (pontoCelula->ponto->id == id1)
+        {
+            p1 = (double *)malloc(pontoCelula->ponto->sCoordenadas);
+            p1 = pontoCelula->ponto->coordenadas;
+            size = pontoCelula->ponto->sCoordenadas;
+        }
+
+        if (pontoCelula->ponto->id == id2)
+        {
+            p2 = (double *)malloc(pontoCelula->ponto->sCoordenadas);
+            p2 = pontoCelula->ponto->coordenadas;
+        }
+
+        // Se encontrou os dois pontos:
+        if ((p1 != NULL) && (p2 != NULL))
+            break;
+    }
+
+    if (pontoCelula == NULL)
+        return -1;
+
+    for (int i = 0; sIterator != size; i++)
+    {
+        distancia += pow(p2[i] - p1[i], 2);
+        sIterator += sizeof(p1[i]);
+
+        // printf("entrei\n");
+    }
+
+    // printf("%.2lf ", sqrt(distancia));
+    return sqrt(distancia);
 }
