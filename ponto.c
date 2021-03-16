@@ -1,28 +1,8 @@
 #include "ponto.h"
 
-typedef struct cel TCelula;
 
-struct ponto
-{
-    char *nome;
-    int id;
-    double *coordenadas;
-    size_t sCoordenadas;
-};
 
-struct cel
-{
-    Ponto *ponto;
-    TCelula *prox;
-};
-
-struct listapontos
-{
-    TCelula *ini;
-    TCelula *fim;
-};
-
-ListaPontos *criaLista()
+ListaPontos *criaListaPontos()
 {
     ListaPontos *lista = (ListaPontos *)malloc(sizeof(ListaPontos));
 
@@ -60,7 +40,7 @@ Ponto *iniciaPonto(char *dadosPonto, int id)
 
 void inserePonto(Ponto *ponto, ListaPontos *lista)
 {
-    TCelula *novoPonto = (TCelula *)malloc(sizeof(TCelula));
+    celulaPonto *novoPonto = (celulaPonto *)malloc(sizeof(celulaPonto));
 
     novoPonto->prox = lista->ini;
     novoPonto->ponto = ponto;
@@ -72,8 +52,8 @@ void inserePonto(Ponto *ponto, ListaPontos *lista)
 
 void imprime(ListaPontos *lista)
 {
-    TCelula *pontoCelula;
-
+    celulaPonto *pontoCelula;
+    
     for (pontoCelula = lista->ini; pontoCelula != NULL; pontoCelula = pontoCelula->prox)
     {
         printf("%s ", pontoCelula->ponto->nome);
@@ -89,11 +69,11 @@ void imprime(ListaPontos *lista)
 
 ListaPontos *liberaLista(ListaPontos *lista)
 {
-    TCelula *pontoCelula = lista->ini;
+    celulaPonto *pontoCelula = lista->ini;
 
     while (pontoCelula != NULL)
     {
-        TCelula *pontoCelulaAtual = pontoCelula->prox;
+        celulaPonto *pontoCelulaAtual = pontoCelula->prox;
         liberaPonto(pontoCelula->ponto);
         free(pontoCelula);
         pontoCelula = pontoCelulaAtual;
@@ -112,26 +92,56 @@ void liberaPonto(Ponto *ponto)
     }
 }
 
+// void encontraPontos(ListaPontos *lista, int id1, int id2, Ponto *p1, Ponto *p2)
+// {
+//     celulaPonto *pontoCelula;
+
+//     for (pontoCelula = lista->ini; pontoCelula != NULL; pontoCelula = pontoCelula->prox)
+//     {
+//         if (pontoCelula->ponto->id == id1)
+//         {
+//             p1 = (Ponto *)malloc(sizeof(Ponto));
+//             p1 = pontoCelula->ponto;
+//         }
+
+//         if (pontoCelula->ponto->id == id2)
+//         {
+//             p2 = (Ponto *)malloc(sizeof(Ponto));
+//             p2 = pontoCelula->ponto;
+//         }
+
+//         // Se encontrou os dois pontos:
+//         if ((p1 != NULL) && (p2 != NULL))
+//             break;
+//     }
+//     return;
+// }
+
 double calcDistancia(ListaPontos *lista, int id1, int id2)
 {
-    TCelula *pontoCelula;
-    double *p1 = NULL, *p2 = NULL, distancia = 0;
-    size_t size, sIterator = 0;
+    double distancia = 0;
+    size_t sIterator = 0;
+    Ponto *p1 = NULL;
+    Ponto *p2 = NULL;
+
+    // encontraPontos(lista, id1, id2, p1, p2);
+
+
+    //*********************************************************///
+    celulaPonto *pontoCelula;
 
     for (pontoCelula = lista->ini; pontoCelula != NULL; pontoCelula = pontoCelula->prox)
     {
-
         if (pontoCelula->ponto->id == id1)
         {
-            p1 = (double *)malloc(pontoCelula->ponto->sCoordenadas);
-            p1 = pontoCelula->ponto->coordenadas;
-            size = pontoCelula->ponto->sCoordenadas;
+            p1 = (Ponto *)malloc(sizeof(Ponto));
+            p1 = pontoCelula->ponto;
         }
 
         if (pontoCelula->ponto->id == id2)
         {
-            p2 = (double *)malloc(pontoCelula->ponto->sCoordenadas);
-            p2 = pontoCelula->ponto->coordenadas;
+            p2 = (Ponto *)malloc(sizeof(Ponto));
+            p2 = pontoCelula->ponto;
         }
 
         // Se encontrou os dois pontos:
@@ -139,15 +149,15 @@ double calcDistancia(ListaPontos *lista, int id1, int id2)
             break;
     }
 
-    if (pontoCelula == NULL)
+    //*********************************************************///
+
+    if ((p1 == NULL) && (p2 == NULL))
         return -1;
 
-    for (int i = 0; sIterator != size; i++)
+    for (int i = 0; sIterator != p1->sCoordenadas; i++)
     {
-        distancia += pow(p2[i] - p1[i], 2);
-        sIterator += sizeof(p1[i]);
-
-        // printf("entrei\n");
+        distancia += pow(p2->coordenadas[i] - p1->coordenadas[i], 2);
+        sIterator += sizeof(p1->coordenadas[i]);
     }
 
     // printf("%.2lf ", sqrt(distancia));

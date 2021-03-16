@@ -1,14 +1,19 @@
 #include "stdio.h"
 #include <stdlib.h>
 #include <string.h>
-#include "ponto.h"
+#include "mst.h"
+
+
+int cmpfunc (const void * a, const void * b) {
+   return ( *(int*)a - *(int*)b );
+}
 
 int main(int argc, char *argv[])
 {
 
     FILE *entrada = NULL;
     char caracterAtual, fimLinha = '\n';
-    int nPontos = 0;
+    int nPontos = 0, i = 0, j = 0;
     char *line = NULL;
     size_t size = 1000;
 
@@ -28,8 +33,8 @@ int main(int argc, char *argv[])
     double distanciaPontos[nPontos][nPontos];
 
     // Preenche matriz de distância entre pontos com 0's.
-    for (int i = 0; i < nPontos; i++)
-        for (int j = 0; j < nPontos; j++)
+    for (i = 0; i < nPontos; i++)
+        for (j = 0; j < nPontos; j++)
             distanciaPontos[i][j] = 0;
 
     rewind(entrada);
@@ -38,7 +43,7 @@ int main(int argc, char *argv[])
     char **arrayPontos = malloc(nPontos * size);
 
     // Lê as linhas do arquivo
-    for (int i = 0; getline(&line, &size, entrada) != -1; i++)
+    for (i = 0; getline(&line, &size, entrada) != -1; i++)
     {
         arrayPontos[i] = (char *)malloc(size);
         strcpy(arrayPontos[i], line);
@@ -48,9 +53,9 @@ int main(int argc, char *argv[])
     fclose(entrada);
     free(line);
 
-    ListaPontos *lista = criaLista();
+    ListaPontos *lista = criaListaPontos();
 
-    for (int i = 0; i < nPontos; i++)
+    for (i = 0; i < nPontos; i++)
     {
         inserePonto(iniciaPonto(arrayPontos[i], i), lista);
         free(arrayPontos[i]);
@@ -58,15 +63,31 @@ int main(int argc, char *argv[])
 
     free(arrayPontos);
 
+    ListaArestas *listaArestas = criaListaArestas();
     int max = 0;
-    for (int i = 0; i < nPontos; i++)
+    int nItensListaAresta = 0; 
+    for (i = 0; i < nPontos; i++)
     {
-        for (int j = 0; j < max; j++)
+        for (j = 0; j < max; j++)
+        {
             distanciaPontos[i][j] = calcDistancia(lista, i, j);
+            insereAresta(iniciaAresta(lista, i, j, distanciaPontos[i][j]), listaArestas);
+            nItensListaAresta++;
+        }
         max++;
     }
 
+    // for (i = 0; i < nPontos; i++)
+    // {
+    //     for (j = 0; j < nPontos; j++)
+    //         printf("%.2lf ", distanciaPontos[i][j]);
+    //     printf("\n");
+    // }
+    
+    imprimeArestas(listaArestas);
     liberaLista(lista);
+
+    qsort(listaArestas, nItensListaAresta, sizeof(ListaArestas), cmpfunc);
 
     return 0;
 }
