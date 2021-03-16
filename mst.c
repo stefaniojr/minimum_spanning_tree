@@ -42,7 +42,6 @@ Aresta *iniciaAresta(ListaPontos *lista, int id1, int id2, double distancia)
 
     //*********************************************************///
 
-
     aresta->destino = p1;
     aresta->origem = p2;
     aresta->distancia = distancia;
@@ -68,7 +67,70 @@ void imprimeArestas(ListaArestas *lista)
     int i = 1;
     for (arestaCelula = lista->ini; arestaCelula != NULL; arestaCelula = arestaCelula->prox)
     {
-        printf("%d. %s %s %lf\n", i, arestaCelula->aresta->origem->nome, arestaCelula->aresta->destino->nome, arestaCelula->aresta->distancia);
+        printf("%s %s %lf\n", arestaCelula->aresta->origem->nome, arestaCelula->aresta->destino->nome, arestaCelula->aresta->distancia);
         i++;
     }
+}
+
+void mergeSortListaArestas(ListaArestas **lista)
+{
+    celulaAresta *arestaCelula = (*lista)->ini;
+    ListaArestas *a1 = (ListaArestas *)malloc(sizeof(ListaArestas));
+    ListaArestas *a2 = (ListaArestas *)malloc(sizeof(ListaArestas));
+
+    if ((arestaCelula == NULL) || (arestaCelula->prox == NULL))
+        return;
+
+    divisorDeListas(arestaCelula, &a1->ini, &a2->ini);
+
+    mergeSortListaArestas(&a1);
+    mergeSortListaArestas(&a2);
+
+    (*lista)->ini = mergeListasArestas(a1->ini, a2->ini);
+}
+
+void divisorDeListas(celulaAresta *inicio, celulaAresta **frente, celulaAresta **atras)
+{
+    celulaAresta *umAUm;
+    celulaAresta *doisADois;
+
+    umAUm = inicio;
+    doisADois = inicio->prox;
+
+    while (doisADois != NULL)
+    {
+        doisADois = doisADois->prox;
+        if (doisADois != NULL)
+        {
+            umAUm = umAUm->prox;
+            doisADois = doisADois->prox;
+        }
+    }
+
+    *frente = inicio;
+    *atras = umAUm->prox;
+    //doisADois->prox = NULL;
+}
+
+celulaAresta *mergeListasArestas(celulaAresta *a1, celulaAresta *a2)
+{
+    celulaAresta *aresta = NULL;
+
+    if (a1 == NULL)
+        return a2;
+    else if (a2 == NULL)
+        return a1;
+
+    if (a1->aresta->distancia <= a2->aresta->distancia)
+    {
+        aresta = a1;
+        aresta->prox = mergeListasArestas(a1->prox, a2);
+    }
+    else
+    {
+        aresta = a2;
+        aresta->prox = mergeListasArestas(a1, a2->prox);
+    }
+
+    return aresta;
 }

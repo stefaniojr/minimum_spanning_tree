@@ -3,9 +3,15 @@
 #include <string.h>
 #include "mst.h"
 
+static int cmpfunc(const void *a, const void *b)
+{
 
-int cmpfunc (const void * a, const void * b) {
-   return ( *(int*)a - *(int*)b );
+    Aresta *p1 = (Aresta *)malloc(sizeof(Aresta));
+    Aresta *p2 = (Aresta *)malloc(sizeof(Aresta));
+    p1 = *(Aresta **)a;
+    p2 = *(Aresta **)b;
+
+    return (1);
 }
 
 int main(int argc, char *argv[])
@@ -65,7 +71,7 @@ int main(int argc, char *argv[])
 
     ListaArestas *listaArestas = criaListaArestas();
     int max = 0;
-    int nItensListaAresta = 0; 
+    int nItensListaAresta = 0;
     for (i = 0; i < nPontos; i++)
     {
         for (j = 0; j < max; j++)
@@ -83,11 +89,9 @@ int main(int argc, char *argv[])
     //         printf("%.2lf ", distanciaPontos[i][j]);
     //     printf("\n");
     // }
-    
+
+    mergeSortListaArestas(&listaArestas);
     imprimeArestas(listaArestas);
     liberaLista(lista);
-
-    qsort(listaArestas, nItensListaAresta, sizeof(ListaArestas), cmpfunc);
-
     return 0;
 }
