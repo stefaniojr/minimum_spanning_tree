@@ -38,5 +38,6 @@ Ponto* find(Ponto *p);
 void Union(Ponto *p1, Ponto *p2);
 bool conectado(Ponto *p1, Ponto *p2);
 void geraVetorArestasMST(ArvMST *arvMST);
+void removeKArestas(ArvMST* arvMST);
 
 #endif /* MST_H_ */

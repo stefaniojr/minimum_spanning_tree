@@ -58,12 +58,12 @@ void geraVetorArestasMST(ArvMST *arvMST)
 
         if (!conectado(arvMST->vetorArestas[i]->origem, arvMST->vetorArestas[i]->destino))
         {
-            printf("Root de %s é: %s || Root de %s é: %s\n", arvMST->vetorArestas[i]->origem->nome, find(arvMST->vetorArestas[i]->origem)->nome, arvMST->vetorArestas[i]->destino->nome, find(arvMST->vetorArestas[i]->destino)->nome);
-
+            printf("ANTES: Root de %s é: %s || Root de %s é: %s\n", arvMST->vetorArestas[i]->origem->nome, find(arvMST->vetorArestas[i]->origem)->nome, arvMST->vetorArestas[i]->destino->nome, find(arvMST->vetorArestas[i]->destino)->nome);
             arvMST->vetorArestasMST[arvMST->nVetorArestasMST] = arvMST->vetorArestas[i];
             arvMST->nVetorArestasMST++;
             Union(arvMST->vetorArestas[i]->origem, arvMST->vetorArestas[i]->destino);
             arvMST->vetorArestasMST = realloc(arvMST->vetorArestasMST, (arvMST->nVetorArestasMST + 1) * sizeof(Aresta *));
+            printf("DEPOIS: Root de %s é: %s || Root de %s é: %s\n\n", arvMST->vetorArestas[i]->origem->nome, find(arvMST->vetorArestas[i]->origem)->nome, arvMST->vetorArestas[i]->destino->nome, find(arvMST->vetorArestas[i]->destino)->nome);
         }
     }
 }
@@ -95,18 +95,40 @@ void Union(Ponto *p1, Ponto *p2)
 
     if (root1->rank < root2->rank)
     {
-        p2->rank += p1->rank;
+        //p2->rank += p1->rank;
         root1->pai = root2;
     }
 
+    else if (root1->rank > root2->rank)
+    {
+        //p1->rank += p2->rank;
+        root2->pai = root1;
+    }
     else
     {
-        p1->rank += p2->rank;
         root2->pai = root1;
+        root1->rank++;
     }
 }
 
 bool conectado(Ponto *p1, Ponto *p2)
 {
     return find(p1)->id == find(p2)->id;
+}
+
+void removeKArestas(ArvMST *arvMST)
+{
+    int qtEliminar = arvMST->nConjuntos - 1;
+    for (int i = arvMST->nVetorArestasMST - 1; i >= 0; i--)
+    {
+        if(arvMST->nVetorArestasMST == 0)
+            break;
+        
+        //liberaMemoria
+        arvMST->nVetorArestasMST--;
+        qtEliminar--;
+
+        if(qtEliminar == 0)
+            break;
+    }
 }

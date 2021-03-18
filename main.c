@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
     qsort(arvMST->vetorArestas, arvMST->nVetorArestas, sizeof(Aresta *), compDouble);
 
     geraVetorArestasMST(arvMST);
+    removeKArestas(arvMST);
 
     //for (i = 0; i < arvMST->nVetorArestas; i++)
     //printf("O lider de %s é: %s || O lider de %s é: %s\n", arvMST->vetorArestas[i]->origem->nome, arvMST->vetorArestas[i]->origem->pai->nome, arvMST->vetorArestas[i]->destino->nome, arvMST->vetorArestas[i]->destino->pai->nome);
@@ -96,6 +97,8 @@ int main(int argc, char *argv[])
 
     for (i = 0; i < arvMST->nVetorArestasMST; i++)
         printf("%d. %s %s %lf\n", (i + 1), arvMST->vetorArestasMST[i]->origem->nome, arvMST->vetorArestasMST[i]->destino->nome, arvMST->vetorArestasMST[i]->distancia);
+    
+    
 
     //algoritmoMST(arvMST, sizeListaArestas);
     liberaLista(lista);
