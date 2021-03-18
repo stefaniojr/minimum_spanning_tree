@@ -2,36 +2,41 @@
 #define MST_H_
 
 #include "ponto.h"
+#include <stdbool.h>
 
 typedef struct aresta Aresta;
-typedef struct listaarestas ListaArestas;
-typedef struct celulaaresta celulaAresta;
+typedef struct arvMST ArvMST;
+typedef struct subArvMST SubArvMST;
 
 struct aresta
 {
     Ponto *origem;
     Ponto *destino;
     double distancia;
+    int id;
 };
 
-struct celulaaresta
-{
-    Aresta *aresta;
-    celulaAresta *prox;
+struct arvMST {
+    int nConjuntos;
+    Aresta** vetorArestas;
+    int nVetorArestas;
+    Aresta** vetorArestasMST;
+    int nVetorArestasMST;
 };
 
-struct listaarestas
-{
-    celulaAresta *ini;
-    celulaAresta *fim;
+struct subArvMST {
+    Ponto* pai;
+    int rank;
+    SubArvMST* prox;
 };
 
-ListaArestas *criaListaArestas();
-Aresta *iniciaAresta(ListaPontos *lista, int id1, int id2, double distancia);
-void insereAresta(Aresta *aresta, ListaArestas *lista);
-void imprimeArestas(ListaArestas *lista);
-void mergeSortListaArestas(ListaArestas **lista);
-void divisorDeListas(celulaAresta *inicio, celulaAresta **frente, celulaAresta **atras);
-celulaAresta *mergeListasArestas(celulaAresta *a1, celulaAresta *a2);
+Aresta* insereAresta(ListaPontos *lista, int id1, int id2, double distancia);
+void imprimeArestas(Aresta *lista);
+ArvMST* criaArvMST(int nItensPorSubConjunto);
+void algoritmoMST(ArvMST* arvMST, int sizeListaArestas);
+int find(Ponto *p);
+void Union(Ponto *p1, Ponto *p2);
+bool conectado(Ponto *p1, Ponto *p2);
+void geraVetorArestasMST(ArvMST *arvMST);
 
 #endif /* MST_H_ */

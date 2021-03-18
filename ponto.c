@@ -18,12 +18,14 @@ Ponto *iniciaPonto(char *dadosPonto, int id)
     Ponto *ponto = (Ponto *)malloc(sizeof(Ponto));
 
     ponto->id = id;
+    ponto->rank = 0;
     char *substr = strtok(dadosPonto, ",\n");
     ponto->nome = (char *)malloc((strlen(substr) + 1) * (sizeof(char)));
     strcpy(ponto->nome, substr);
     ponto->coordenadas = (double *)malloc(sizeof(double));
     ponto->sCoordenadas = (sizeof(double));
 
+    ponto->pai = ponto;
     for (int i = 0; substr != NULL; i++)
     {
         substr = strtok(NULL, ",\n");
@@ -156,10 +158,10 @@ double calcDistancia(ListaPontos *lista, int id1, int id2)
 
     for (int i = 0; sIterator != p1->sCoordenadas; i++)
     {
-        distancia += pow(p2->coordenadas[i] - p1->coordenadas[i], 2);
+        distancia += (p2->coordenadas[i] - p1->coordenadas[i]) * (p2->coordenadas[i] - p1->coordenadas[i]);
         sIterator += sizeof(p1->coordenadas[i]);
     }
 
     // printf("%.2lf ", sqrt(distancia));
-    return sqrt(distancia);
+    return distancia;
 }

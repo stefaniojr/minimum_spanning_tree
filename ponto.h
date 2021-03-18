@@ -16,6 +16,8 @@ struct ponto
     int id;
     double *coordenadas;
     size_t sCoordenadas;
+    Ponto* pai;
+    int rank;
 };
 
 struct celulaponto

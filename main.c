@@ -3,15 +3,17 @@
 #include <string.h>
 #include "mst.h"
 
-static int cmpfunc(const void *a, const void *b)
+static int compDouble(const void *item1, const void *item2)
 {
+    Aresta *a1 = *(Aresta **)item1;
+    Aresta *a2 = *(Aresta **)item2;
 
-    Aresta *p1 = (Aresta *)malloc(sizeof(Aresta));
-    Aresta *p2 = (Aresta *)malloc(sizeof(Aresta));
-    p1 = *(Aresta **)a;
-    p2 = *(Aresta **)b;
-
-    return (1);
+    if (((a1->distancia) - (a2->distancia)) > 0)
+        return 1;
+    else if (((a1->distancia) - (a2->distancia)) < 0)
+        return -1;
+    else
+        return 0;
 }
 
 int main(int argc, char *argv[])
@@ -36,12 +38,9 @@ int main(int argc, char *argv[])
         if (caracterAtual == fimLinha)
             nPontos++;
 
-    double distanciaPontos[nPontos][nPontos];
-
-    // Preenche matriz de distância entre pontos com 0's.
+    double **distanciaPontos = (double **)malloc(nPontos * sizeof(double *));
     for (i = 0; i < nPontos; i++)
-        for (j = 0; j < nPontos; j++)
-            distanciaPontos[i][j] = 0;
+        distanciaPontos[i] = (double *)malloc(nPontos * sizeof(double));
 
     rewind(entrada);
 
@@ -69,29 +68,35 @@ int main(int argc, char *argv[])
 
     free(arrayPontos);
 
-    ListaArestas *listaArestas = criaListaArestas();
+    int k = 3;
+    ArvMST *arvMST = criaArvMST(k);
+
     int max = 0;
-    int nItensListaAresta = 0;
+
     for (i = 0; i < nPontos; i++)
     {
         for (j = 0; j < max; j++)
         {
+
             distanciaPontos[i][j] = calcDistancia(lista, i, j);
-            insereAresta(iniciaAresta(lista, i, j, distanciaPontos[i][j]), listaArestas);
-            nItensListaAresta++;
+            arvMST->vetorArestas[arvMST->nVetorArestas] = insereAresta(lista, i, j, distanciaPontos[i][j]);
+            arvMST->nVetorArestas++;
+            arvMST->vetorArestas = realloc(arvMST->vetorArestas, (arvMST->nVetorArestas + 1) * sizeof(Aresta *));
         }
         max++;
     }
 
-    // for (i = 0; i < nPontos; i++)
-    // {
-    //     for (j = 0; j < nPontos; j++)
-    //         printf("%.2lf ", distanciaPontos[i][j]);
-    //     printf("\n");
-    // }
+    qsort(arvMST->vetorArestas, arvMST->nVetorArestas, sizeof(Aresta *), compDouble);
 
-    mergeSortListaArestas(&listaArestas);
-    imprimeArestas(listaArestas);
+    geraVetorArestasMST(arvMST);
+
+    //for (i = 0; i < arvMST->nVetorArestas; i++)
+      //  printf("%d. %s %s %lf\n", (i + 1), arvMST->vetorArestas[i]->origem->nome, arvMST->vetorArestas[i]->destino->nome, arvMST->vetorArestas[i]->distancia);
+
+    for (i = 0; i < arvMST->nVetorArestasMST; i++)
+    printf("%d. %s %s %lf\n", (i + 1), arvMST->vetorArestasMST[i]->origem->nome, arvMST->vetorArestasMST[i]->destino->nome, arvMST->vetorArestasMST[i]->distancia);
+
+    //algoritmoMST(arvMST, sizeListaArestas);
     liberaLista(lista);
     return 0;
 }

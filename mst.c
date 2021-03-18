@@ -1,16 +1,6 @@
 #include "mst.h"
 
-ListaArestas *criaListaArestas()
-{
-    ListaArestas *lista = (ListaArestas *)malloc(sizeof(ListaArestas));
-
-    lista->ini = NULL;
-    lista->fim = NULL;
-
-    return lista;
-}
-
-Aresta *iniciaAresta(ListaPontos *lista, int id1, int id2, double distancia)
+Aresta *insereAresta(ListaPontos *lista, int id1Ponto, int id2Ponto, double distancia)
 {
     Aresta *aresta = (Aresta *)malloc(sizeof(Aresta));
 
@@ -20,13 +10,13 @@ Aresta *iniciaAresta(ListaPontos *lista, int id1, int id2, double distancia)
 
     for (pontoCelula = lista->ini; pontoCelula != NULL; pontoCelula = pontoCelula->prox)
     {
-        if (pontoCelula->ponto->id == id1)
+        if (pontoCelula->ponto->id == id1Ponto)
         {
             p1 = (Ponto *)malloc(sizeof(Ponto));
             p1 = pontoCelula->ponto;
         }
 
-        if (pontoCelula->ponto->id == id2)
+        if (pontoCelula->ponto->id == id2Ponto)
         {
             p2 = (Ponto *)malloc(sizeof(Ponto));
             p2 = pontoCelula->ponto;
@@ -49,88 +39,82 @@ Aresta *iniciaAresta(ListaPontos *lista, int id1, int id2, double distancia)
     return aresta;
 }
 
-void insereAresta(Aresta *aresta, ListaArestas *lista)
+ArvMST *criaArvMST(int nConjuntos)
 {
-    celulaAresta *novaAresta = (celulaAresta *)malloc(sizeof(celulaAresta));
-
-    novaAresta->prox = lista->ini;
-    novaAresta->aresta = aresta;
-    lista->ini = novaAresta;
-
-    if (lista->fim == NULL)
-        lista->fim = novaAresta;
+    ArvMST *arvMST = (ArvMST *)malloc(sizeof(ArvMST));
+    arvMST->nConjuntos = nConjuntos;
+    arvMST->vetorArestas = (malloc(sizeof(Aresta *)));
+    arvMST->nVetorArestas = 0;
+    arvMST->vetorArestasMST = (malloc(sizeof(Aresta *)));
+    arvMST->nVetorArestasMST = 0;
+    return arvMST;
 }
 
-void imprimeArestas(ListaArestas *lista)
+void geraVetorArestasMST(ArvMST *arvMST)
 {
-    celulaAresta *arestaCelula;
-    int i = 1;
-    for (arestaCelula = lista->ini; arestaCelula != NULL; arestaCelula = arestaCelula->prox)
+
+    for (int i = 0; i < arvMST->nVetorArestas; i++)
     {
-        printf("%s %s %lf\n", arestaCelula->aresta->origem->nome, arestaCelula->aresta->destino->nome, arestaCelula->aresta->distancia);
-        i++;
-    }
-}
 
-void mergeSortListaArestas(ListaArestas **lista)
-{
-    celulaAresta *arestaCelula = (*lista)->ini;
-    ListaArestas *a1 = (ListaArestas *)malloc(sizeof(ListaArestas));
-    ListaArestas *a2 = (ListaArestas *)malloc(sizeof(ListaArestas));
-
-    if ((arestaCelula == NULL) || (arestaCelula->prox == NULL))
-        return;
-
-    divisorDeListas(arestaCelula, &a1->ini, &a2->ini);
-
-    mergeSortListaArestas(&a1);
-    mergeSortListaArestas(&a2);
-
-    (*lista)->ini = mergeListasArestas(a1->ini, a2->ini);
-}
-
-void divisorDeListas(celulaAresta *inicio, celulaAresta **frente, celulaAresta **atras)
-{
-    celulaAresta *umAUm;
-    celulaAresta *doisADois;
-
-    umAUm = inicio;
-    doisADois = inicio->prox;
-
-    while (doisADois != NULL)
-    {
-        doisADois = doisADois->prox;
-        if (doisADois != NULL)
+        if (!conectado(arvMST->vetorArestas[i]->origem, arvMST->vetorArestas[i]->destino))
         {
-            umAUm = umAUm->prox;
-            doisADois = doisADois->prox;
+            //printf("O lider de %s é: %s || O lider de %s é: %s\n", arvMST->vetorArestas[i]->origem->nome, arvMST->vetorArestas[i]->origem->pai->nome, arvMST->vetorArestas[i]->destino->nome, arvMST->vetorArestas[i]->destino->pai->nome);
+
+            arvMST->vetorArestasMST[arvMST->nVetorArestasMST] = arvMST->vetorArestas[i];
+            arvMST->nVetorArestasMST++;
+            Union(arvMST->vetorArestas[i]->origem, arvMST->vetorArestas[i]->destino);
+            arvMST->vetorArestasMST = realloc(arvMST->vetorArestasMST, (arvMST->nVetorArestasMST + 1) * sizeof(Aresta *));
+            
         }
     }
-
-    *frente = inicio;
-    *atras = umAUm->prox;
-    //doisADois->prox = NULL;
 }
 
-celulaAresta *mergeListasArestas(celulaAresta *a1, celulaAresta *a2)
+// Retorna o líder do grupo.
+// int find(Ponto *p)
+// {
+//     while (p->id != p->pai->id)
+//     {
+//         p->pai = p->pai->pai;
+//         p->id = p->pai->id;
+//     }
+//     return p->id;
+// }
+
+int find(Ponto *p)
 {
-    celulaAresta *aresta = NULL;
+    // while (p->id != p->pai->id)
+    // {
+    //     p->pai = p->pai->pai;
+    //     p->id = p->pai->id;
+    // }
+    // return p->id;
+    int x = p->pai->id;
 
-    if (a1 == NULL)
-        return a2;
-    else if (a2 == NULL)
-        return a1;
+    if(p->id != p->pai->id)
+        x = find(p->pai);
+    
+    return x;
+}
 
-    if (a1->aresta->distancia <= a2->aresta->distancia)
+
+// Dado dois pontos, unem eles.
+void Union(Ponto *p1, Ponto *p2)
+{
+
+    if (p1->rank < p2->rank)
     {
-        aresta = a1;
-        aresta->prox = mergeListasArestas(a1->prox, a2);
+        p1->pai = p2;
+        p2->rank += p1->rank;
     }
+
     else
     {
-        aresta = a2;
-        aresta->prox = mergeListasArestas(a1, a2->prox);
+        p2->pai = p1;
+        p1->rank += p2->rank;
     }
+}
 
-    return aresta;
+bool conectado(Ponto *p1, Ponto *p2)
+{
+    return find(p1) == find(p2);
 }
