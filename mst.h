@@ -34,7 +34,7 @@ Aresta* insereAresta(ListaPontos *lista, int id1, int id2, double distancia);
 void imprimeArestas(Aresta *lista);
 ArvMST* criaArvMST(int nItensPorSubConjunto);
 void algoritmoMST(ArvMST* arvMST, int sizeListaArestas);
-int find(Ponto *p);
+Ponto* find(Ponto *p);
 void Union(Ponto *p1, Ponto *p2);
 bool conectado(Ponto *p1, Ponto *p2);
 void geraVetorArestasMST(ArvMST *arvMST);

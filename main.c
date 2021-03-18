@@ -91,10 +91,11 @@ int main(int argc, char *argv[])
     geraVetorArestasMST(arvMST);
 
     //for (i = 0; i < arvMST->nVetorArestas; i++)
-      //  printf("%d. %s %s %lf\n", (i + 1), arvMST->vetorArestas[i]->origem->nome, arvMST->vetorArestas[i]->destino->nome, arvMST->vetorArestas[i]->distancia);
+    //printf("O lider de %s é: %s || O lider de %s é: %s\n", arvMST->vetorArestas[i]->origem->nome, arvMST->vetorArestas[i]->origem->pai->nome, arvMST->vetorArestas[i]->destino->nome, arvMST->vetorArestas[i]->destino->pai->nome);
+    //  printf("%d. %s %s %lf\n", (i + 1), arvMST->vetorArestas[i]->origem->nome, arvMST->vetorArestas[i]->destino->nome, arvMST->vetorArestas[i]->distancia);
 
     for (i = 0; i < arvMST->nVetorArestasMST; i++)
-    printf("%d. %s %s %lf\n", (i + 1), arvMST->vetorArestasMST[i]->origem->nome, arvMST->vetorArestasMST[i]->destino->nome, arvMST->vetorArestasMST[i]->distancia);
+        printf("%d. %s %s %lf\n", (i + 1), arvMST->vetorArestasMST[i]->origem->nome, arvMST->vetorArestasMST[i]->destino->nome, arvMST->vetorArestasMST[i]->distancia);
 
     //algoritmoMST(arvMST, sizeListaArestas);
     liberaLista(lista);

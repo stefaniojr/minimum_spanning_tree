@@ -58,63 +58,55 @@ void geraVetorArestasMST(ArvMST *arvMST)
 
         if (!conectado(arvMST->vetorArestas[i]->origem, arvMST->vetorArestas[i]->destino))
         {
-            //printf("O lider de %s é: %s || O lider de %s é: %s\n", arvMST->vetorArestas[i]->origem->nome, arvMST->vetorArestas[i]->origem->pai->nome, arvMST->vetorArestas[i]->destino->nome, arvMST->vetorArestas[i]->destino->pai->nome);
+            printf("Root de %s é: %s || Root de %s é: %s\n", arvMST->vetorArestas[i]->origem->nome, find(arvMST->vetorArestas[i]->origem)->nome, arvMST->vetorArestas[i]->destino->nome, find(arvMST->vetorArestas[i]->destino)->nome);
 
             arvMST->vetorArestasMST[arvMST->nVetorArestasMST] = arvMST->vetorArestas[i];
             arvMST->nVetorArestasMST++;
             Union(arvMST->vetorArestas[i]->origem, arvMST->vetorArestas[i]->destino);
             arvMST->vetorArestasMST = realloc(arvMST->vetorArestasMST, (arvMST->nVetorArestasMST + 1) * sizeof(Aresta *));
-            
         }
     }
 }
 
-// Retorna o líder do grupo.
-// int find(Ponto *p)
-// {
-//     while (p->id != p->pai->id)
-//     {
-//         p->pai = p->pai->pai;
-//         p->id = p->pai->id;
-//     }
-//     return p->id;
-// }
-
-int find(Ponto *p)
+//Retorna o ponto líder do grupo.
+Ponto *find(Ponto *p)
 {
-    // while (p->id != p->pai->id)
-    // {
-    //     p->pai = p->pai->pai;
-    //     p->id = p->pai->id;
-    // }
-    // return p->id;
-    int x = p->pai->id;
 
-    if(p->id != p->pai->id)
-        x = find(p->pai);
-    
-    return x;
+    Ponto *root = p->pai;
+
+    while (root->id != p->pai->pai->id)
+        root->id = p->pai->pai->id;
+
+    while (p->id != root->id)
+    {
+        int prox = p->pai->pai->id;
+        p->pai->pai->id = root->id;
+        p->id = prox;
+    }
+
+    return root;
 }
-
 
 // Dado dois pontos, unem eles.
 void Union(Ponto *p1, Ponto *p2)
 {
+    Ponto *root1 = find(p1);
+    Ponto *root2 = find(p2);
 
-    if (p1->rank < p2->rank)
+    if (root1->rank < root2->rank)
     {
-        p1->pai = p2;
         p2->rank += p1->rank;
+        root1->pai = root2;
     }
 
     else
     {
-        p2->pai = p1;
         p1->rank += p2->rank;
+        root2->pai = root1;
     }
 }
 
 bool conectado(Ponto *p1, Ponto *p2)
 {
-    return find(p1) == find(p2);
+    return find(p1)->id == find(p2)->id;
 }
