@@ -2,11 +2,12 @@
 #define MST_H_
 
 #include "ponto.h"
-#include <stdbool.h>
+
 
 typedef struct aresta Aresta;
 typedef struct arvMST ArvMST;
-typedef struct subArvMST SubArvMST;
+typedef struct arestasMST ArestasMST;
+typedef struct conjunto Conjunto;
 
 struct aresta
 {
@@ -20,14 +21,21 @@ struct arvMST {
     int nConjuntos;
     Aresta** vetorArestas;
     int nVetorArestas;
-    Aresta** vetorArestasMST;
-    int nVetorArestasMST;
+
+    ArestasMST *iniArestasMST;
+    ArestasMST *fimArestasMST;
+    int nArestasMST;
 };
 
-struct subArvMST {
-    Ponto* pai;
-    int rank;
-    SubArvMST* prox;
+struct arestasMST{
+    Aresta* aresta;
+    ArestasMST* prox;
+};
+
+struct conjunto {
+    Ponto** pontos;
+    Ponto* root;
+    int nPontos;
 };
 
 Aresta* insereAresta(ListaPontos *lista, int id1, int id2, double distancia);
@@ -38,6 +46,7 @@ Ponto* find(Ponto *p);
 void Union(Ponto *p1, Ponto *p2);
 bool conectado(Ponto *p1, Ponto *p2);
 void geraVetorArestasMST(ArvMST *arvMST);
-void removeKArestas(ArvMST* arvMST);
+void removeArestas(ArvMST* arvMST);
+Conjunto *criaConjunto();
 
 #endif /* MST_H_ */

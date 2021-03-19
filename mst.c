@@ -45,25 +45,42 @@ ArvMST *criaArvMST(int nConjuntos)
     arvMST->nConjuntos = nConjuntos;
     arvMST->vetorArestas = (malloc(sizeof(Aresta *)));
     arvMST->nVetorArestas = 0;
-    arvMST->vetorArestasMST = (malloc(sizeof(Aresta *)));
-    arvMST->nVetorArestasMST = 0;
+    arvMST->iniArestasMST = NULL;
+    arvMST->fimArestasMST = NULL;
+    arvMST->nArestasMST = 0;
     return arvMST;
+}
+
+Conjunto *criaConjunto()
+{
+    Conjunto *conjuntos = (Conjunto *)malloc(sizeof(Conjunto));
+    conjuntos->pontos = (malloc(sizeof(Ponto *)));
+    conjuntos->nPontos = 0;
+    conjuntos->root = NULL;
+    return conjuntos;
 }
 
 void geraVetorArestasMST(ArvMST *arvMST)
 {
+
+    Ponto *A = arvMST->vetorArestas[0]->origem;
+    Ponto *B = arvMST->vetorArestas[1]->origem;
 
     for (int i = 0; i < arvMST->nVetorArestas; i++)
     {
 
         if (!conectado(arvMST->vetorArestas[i]->origem, arvMST->vetorArestas[i]->destino))
         {
-            printf("ANTES: Root de %s é: %s || Root de %s é: %s\n", arvMST->vetorArestas[i]->origem->nome, find(arvMST->vetorArestas[i]->origem)->nome, arvMST->vetorArestas[i]->destino->nome, find(arvMST->vetorArestas[i]->destino)->nome);
-            arvMST->vetorArestasMST[arvMST->nVetorArestasMST] = arvMST->vetorArestas[i];
-            arvMST->nVetorArestasMST++;
+            ArestasMST *aresta = (ArestasMST *)malloc(sizeof(ArestasMST));
+            aresta->prox = arvMST->iniArestasMST;
+            aresta->aresta = arvMST->vetorArestas[i];
+            arvMST->iniArestasMST = aresta;
+
+            if (arvMST->fimArestasMST == NULL)
+                arvMST->fimArestasMST = aresta;
+
+            arvMST->nArestasMST++;
             Union(arvMST->vetorArestas[i]->origem, arvMST->vetorArestas[i]->destino);
-            arvMST->vetorArestasMST = realloc(arvMST->vetorArestasMST, (arvMST->nVetorArestasMST + 1) * sizeof(Aresta *));
-            printf("DEPOIS: Root de %s é: %s || Root de %s é: %s\n\n", arvMST->vetorArestas[i]->origem->nome, find(arvMST->vetorArestas[i]->origem)->nome, arvMST->vetorArestas[i]->destino->nome, find(arvMST->vetorArestas[i]->destino)->nome);
         }
     }
 }
@@ -116,19 +133,30 @@ bool conectado(Ponto *p1, Ponto *p2)
     return find(p1)->id == find(p2)->id;
 }
 
-void removeKArestas(ArvMST *arvMST)
+void removeArestas(ArvMST *arvMST)
 {
+    ArestasMST *aresta;
     int qtEliminar = arvMST->nConjuntos - 1;
-    for (int i = arvMST->nVetorArestasMST - 1; i >= 0; i--)
+
+    if (qtEliminar == 0)
+        return;
+
+    for (aresta = arvMST->iniArestasMST; aresta != NULL; aresta = aresta->prox)
     {
-        if(arvMST->nVetorArestasMST == 0)
+        if (arvMST->nArestasMST == 0)
             break;
-        
-        //liberaMemoria
-        arvMST->nVetorArestasMST--;
+
+        Ponto *rootOrigem = find(aresta->aresta->origem);
+        Ponto *rootDestino = find(aresta->aresta->destino);
+        rootOrigem->pai = rootOrigem;
+        rootDestino->pai = rootDestino;
+
+        Aresta* aux;
+        arvMST->iniArestasMST = aresta->prox;
+        //libera(aux)
         qtEliminar--;
 
-        if(qtEliminar == 0)
+        if (qtEliminar == 0)
             break;
     }
 }

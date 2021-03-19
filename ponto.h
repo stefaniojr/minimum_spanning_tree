@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <stdbool.h>
 
 typedef struct ponto Ponto;
 typedef struct listapontos ListaPontos;
@@ -18,6 +19,7 @@ struct ponto
     size_t sCoordenadas;
     Ponto* pai;
     int rank;
+    bool agrupado;
 };
 
 struct celulaponto
