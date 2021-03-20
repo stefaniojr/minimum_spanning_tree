@@ -4,20 +4,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include <stdbool.h>
 
 typedef struct ponto Ponto;
 typedef struct listapontos ListaPontos;
-typedef struct celulaponto celulaPonto;
+typedef struct celulaponto CelulaPonto;
 
 struct ponto
 {
     char *nome;
     int id;
     double *coordenadas;
-    size_t sCoordenadas;
-    Ponto* pai;
+    size_t sCoordenadas; // sCoordenadas ajuda a iterar o vetor de double.
+    Ponto *pai;
     int rank;
     bool agrupado;
 };
@@ -25,22 +24,28 @@ struct ponto
 struct celulaponto
 {
     Ponto *ponto;
-    celulaPonto *prox;
+    CelulaPonto *prox;
 };
 
 struct listapontos
 {
-    celulaPonto *ini;
-    celulaPonto *fim;
+    CelulaPonto *ini;
+    CelulaPonto *fim;
 };
 
+// Cria uma lista de pontos.
 ListaPontos *criaListaPontos();
+// Inicializa um ponto através dos dados de uma string. A string é quebrada usando strtok.
 Ponto *iniciaPonto(char *dadosPonto, int id);
+// Dado um ponto já inicializado, insere ele na lista encadeada de pontos.
 void inserePonto(Ponto *ponto, ListaPontos *lista);
-void imprime(ListaPontos *lista);
-ListaPontos *liberaLista(ListaPontos *lista);
-void liberaPonto(Ponto *ponto);
+// Dado um vetor de strings, preenche uma lista encadeada com suas informações.
+void preencheLista(ListaPontos *lista, char **arrayPontos, int nPontos);
+// Dado dois pontos, calcula a distância entre eles.
 double calcDistancia(ListaPontos *lista, int id1, int id2);
-void encontraPontos(ListaPontos *lista, int id1, int id2, Ponto *p1, Ponto *p2);
+// Libera (tenta, pelo menos) a lista de pontos.
+void liberaLista(ListaPontos *lista);
+// Libera (tenta, pelo menos) um ponto.
+void liberaPonto(Ponto *ponto);
 
 #endif /* PONTO_H_ */

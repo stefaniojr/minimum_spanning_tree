@@ -1,7 +1,6 @@
 #include "ponto.h"
 
-
-
+// Cria uma lista de pontos.
 ListaPontos *criaListaPontos()
 {
     ListaPontos *lista = (ListaPontos *)malloc(sizeof(ListaPontos));
@@ -12,6 +11,22 @@ ListaPontos *criaListaPontos()
     return lista;
 }
 
+// Dado um vetor de strings, preenche uma lista encadeada com suas informações.
+void preencheLista(ListaPontos *lista, char **arrayPontos, int nPontos)
+{
+    int i = 0;
+    for (i = 0; i < nPontos; i++)
+    {
+        inserePonto(iniciaPonto(arrayPontos[i], i), lista);
+        free(arrayPontos[i]);
+    }
+
+    free(arrayPontos);
+}
+
+// Inicializa um ponto através dos dados de uma string. A string é quebrada usando strtok.
+// Cada separador (vírgula ou \n) indica o fim de uma informação, isto é, a string é separada por vírgulas e cada palavra entre as vírgulas é uma informação.
+// Essas informações já estão em uma ordem previamente conhecida (ponto + coordenadas).
 Ponto *iniciaPonto(char *dadosPonto, int id)
 {
 
@@ -40,9 +55,10 @@ Ponto *iniciaPonto(char *dadosPonto, int id)
     return ponto;
 }
 
+// Dado um ponto já inicializado, insere ele na lista encadeada de pontos.
 void inserePonto(Ponto *ponto, ListaPontos *lista)
 {
-    celulaPonto *novoPonto = (celulaPonto *)malloc(sizeof(celulaPonto));
+    CelulaPonto *novoPonto = (CelulaPonto *)malloc(sizeof(CelulaPonto));
 
     novoPonto->prox = lista->ini;
     novoPonto->ponto = ponto;
@@ -52,73 +68,8 @@ void inserePonto(Ponto *ponto, ListaPontos *lista)
         lista->fim = novoPonto;
 }
 
-void imprime(ListaPontos *lista)
-{
-    celulaPonto *pontoCelula;
-    
-    for (pontoCelula = lista->ini; pontoCelula != NULL; pontoCelula = pontoCelula->prox)
-    {
-        printf("%s ", pontoCelula->ponto->nome);
-        size_t sIterator = 0;
-        for (int i = 0; sIterator != pontoCelula->ponto->sCoordenadas; i++)
-        {
-            printf("%lf ", pontoCelula->ponto->coordenadas[i]);
-            sIterator += sizeof(pontoCelula->ponto->coordenadas[i]);
-        }
-        printf("\n");
-    }
-}
-
-ListaPontos *liberaLista(ListaPontos *lista)
-{
-    celulaPonto *pontoCelula = lista->ini;
-
-    while (pontoCelula != NULL)
-    {
-        celulaPonto *pontoCelulaAtual = pontoCelula->prox;
-        liberaPonto(pontoCelula->ponto);
-        free(pontoCelula);
-        pontoCelula = pontoCelulaAtual;
-    }
-
-    free(lista);
-}
-
-void liberaPonto(Ponto *ponto)
-{
-    if (ponto != NULL)
-    {
-        free(ponto->nome);
-        free(ponto->coordenadas);
-        free(ponto);
-    }
-}
-
-// void encontraPontos(ListaPontos *lista, int id1, int id2, Ponto *p1, Ponto *p2)
-// {
-//     celulaPonto *pontoCelula;
-
-//     for (pontoCelula = lista->ini; pontoCelula != NULL; pontoCelula = pontoCelula->prox)
-//     {
-//         if (pontoCelula->ponto->id == id1)
-//         {
-//             p1 = (Ponto *)malloc(sizeof(Ponto));
-//             p1 = pontoCelula->ponto;
-//         }
-
-//         if (pontoCelula->ponto->id == id2)
-//         {
-//             p2 = (Ponto *)malloc(sizeof(Ponto));
-//             p2 = pontoCelula->ponto;
-//         }
-
-//         // Se encontrou os dois pontos:
-//         if ((p1 != NULL) && (p2 != NULL))
-//             break;
-//     }
-//     return;
-// }
-
+// Dado dois pontos, calcula a distância entre eles.
+// PS: uma das funções mais importantes deste TAD!!
 double calcDistancia(ListaPontos *lista, int id1, int id2)
 {
     double distancia = 0;
@@ -126,12 +77,10 @@ double calcDistancia(ListaPontos *lista, int id1, int id2)
     Ponto *p1 = NULL;
     Ponto *p2 = NULL;
 
-    // encontraPontos(lista, id1, id2, p1, p2);
+    CelulaPonto *pontoCelula;
 
-
-    //*********************************************************///
-    celulaPonto *pontoCelula;
-
+    // Encontra dois pontos. (Repetição de código, usamos o mesmo bloco em alguma na função insereAresta() do TAD aresta,
+    // mas por algum motivo estranho não conseguimos criar uma função desse trecho). Fica pra uma próxima :(
     for (pontoCelula = lista->ini; pontoCelula != NULL; pontoCelula = pontoCelula->prox)
     {
         if (pontoCelula->ponto->id == id1)
@@ -151,17 +100,42 @@ double calcDistancia(ListaPontos *lista, int id1, int id2)
             break;
     }
 
-    //*********************************************************///
-
     if ((p1 == NULL) && (p2 == NULL))
         return -1;
 
+    // Cálculo da distância entre esses pontos. Não foi utilizado sqrt.
     for (int i = 0; sIterator != p1->sCoordenadas; i++)
     {
         distancia += (p2->coordenadas[i] - p1->coordenadas[i]) * (p2->coordenadas[i] - p1->coordenadas[i]);
         sIterator += sizeof(p1->coordenadas[i]);
     }
 
-    // printf("%.2lf ", sqrt(distancia));
     return distancia;
+}
+
+// Libera (tenta, pelo menos) a lista de pontos.
+void liberaLista(ListaPontos *lista)
+{
+    CelulaPonto *pontoCelula = lista->ini;
+
+    while (pontoCelula != NULL)
+    {
+        CelulaPonto *pontoCelulaAtual = pontoCelula->prox;
+        liberaPonto(pontoCelula->ponto);
+        free(pontoCelula);
+        pontoCelula = pontoCelulaAtual;
+    }
+
+    free(lista);
+}
+
+// Libera (tenta, pelo menos) um ponto.
+void liberaPonto(Ponto *ponto)
+{
+    if (ponto != NULL)
+    {
+        free(ponto->nome);
+        free(ponto->coordenadas);
+        free(ponto);
+    }
 }
